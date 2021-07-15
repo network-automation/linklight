@@ -1,0 +1,43 @@
+---
+- name: Perform Checks to make sure this Playbook will complete successfully
+  hosts: localhost
+  connection: local
+  become: false
+  gather_facts: true
+  tasks:
+    - name: GRAB ZONE ID
+      community.aws.route53_zone:
+        zone: "{{workshop_dns_zone}}"
+      register: AWSINFO
+
+    - name: GRAB ROUTE53 INFORMATION
+      community.aws.route53_info:
+        query: record_sets
+        max_items: 300
+        hosted_zone_id: "{{AWSINFO.zone_id}}"
+      register: record_sets
+      ignore_errors: true
+
+    - name: I am done with your nonsense
+      community.aws.route53_info:
+        query: record_sets
+        max_items: 300
+        hosted_zone_id: "{{AWSINFO.zone_id}}"
+      register: also_record_sets
+      ignore_errors: true
+
+    - name: So very done  :)
+      community.aws.route53_info:
+        query: record_sets
+        max_items: 300
+        hosted_zone_id: "{{AWSINFO.zone_id}}"
+      register: moar_record_sets
+      ignore_errors: true
+
+    - name: FOOBARBAZ
+      debug:
+        msg: 'I wonder if any of those worked: {{ record_sets.ResourceRecordSets|length }}, {{ also_record_sets.ResourceRecordSets|length }}, {{ moar_record_sets.ResourceRecordSets|length }}'
+
+    - name: SPAMHAMEGGS
+      debug:
+        msg: 'Foo is: {{ record_sets.foo }}, {{ also_record_sets.foo }}, {{ moar_record_sets.foo }}'
